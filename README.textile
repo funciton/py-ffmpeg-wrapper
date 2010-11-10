@@ -1,0 +1,12 @@
+h1{color:#666}. python FFmpeg wrapper based on rVideo
+
+*Sample usage:*
+
+from video_inspector import VideoInspector
+
+video = VideoInspector("/path/to/video.mov")
+
+print video.duration()
+print video.fps()
+
+Check source code for other methods
