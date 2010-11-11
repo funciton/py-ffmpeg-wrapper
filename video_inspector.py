@@ -20,7 +20,7 @@ class VideoInspector(object):
         self.path = os.path.dirname(video_source)
         self.full_filename = video_source
 
-        self._exec_response = commands.getoutput("%s -i %s 2>&1" % (ffmpeg_bin, self.full_filename))
+        self._exec_response = commands.getoutput("%s -i %s" % (ffmpeg_bin, self.full_filename))
 
         if re.search(".*command\snot\sfound", self._exec_response, flags=re.IGNORECASE):
             raise CommandError()
