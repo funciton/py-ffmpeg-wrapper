@@ -12,3 +12,7 @@ class UnknownFormat(Exception):
 
 class UnreadableFile(Exception):
     pass
+
+
+class CantOverwrite(Exception):
+    pass
