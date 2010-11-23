@@ -27,8 +27,8 @@ class VideoEncoder(object):
             raise CantOverwrite()
 
         cmd = cmd % {"ffmpeg_bin": self._ffmpeg_bin, "input_file": self.original_file.full_filename, "output_file": video_output}
+        cmd = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
         if callback:
-            cmd = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
             fcntl.fcntl(cmd.stderr.fileno(), fcntl.F_SETFL, fcntl.fcntl(cmd.stderr.fileno(), fcntl.F_GETFL) | os.O_NONBLOCK, )
 
             duration = None
