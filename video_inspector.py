@@ -20,48 +20,86 @@ class VideoInspector(object):
         self.path = os.path.dirname(video_source)
         self.full_filename = video_source
 
-        self._exec_response = commands.getoutput("%s -i %s" % (ffmpeg_bin, self.full_filename))
+        self._exec_response = commands.getoutput("%s -i %s" % (
+            ffmpeg_bin,
+            self.full_filename
+        ))
 
-        if re.search(".*command\snot\sfound", self._exec_response, flags=re.IGNORECASE):
+        if re.search(
+            ".*command\snot\sfound",
+            self._exec_response,
+            flags=re.IGNORECASE
+        ):
             raise CommandError()
 
-        self._metadata = re.search("(Input \#.*)\n(Must|At\sleast)", self._exec_response, flags=re.MULTILINE | re.DOTALL)
+        self._metadata = re.search(
+            "(Input \#.*)\n(Must|At\sleast)",
+            self._exec_response,
+            flags=re.MULTILINE | re.DOTALL
+        )
 
-        if re.search("Unknown format", self._exec_response, flags=re.IGNORECASE) or not self._metadata:
+        if re.search(
+            "Unknown format",
+            self._exec_response,
+            flags=re.IGNORECASE
+        ) or not self._metadata:
             raise UnknownFormat()
 
-        if re.search("Duration: N\/A", self._exec_response, flags=re.IGNORECASE | re.MULTILINE):
+        if re.search(
+            "Duration: N\/A",
+            self._exec_response,
+            flags=re.IGNORECASE | re.MULTILINE
+        ):
             raise UnreadableFile()
 
         self._metadata = self._metadata.group(1)
         self._valid = True
 
     def ffmpeg_version(self):
-        return self._exec_response.split("\n")[0].split("version")[-1].split(",")[0].strip()
+        return self._exec_response.split("\n")[0]\
+            .split("version")[-1].split(",")[0].strip()
 
     def ffmpeg_configuration(self):
-        return re.search("(\s*configuration:)(.*)\n", self._exec_response).group(2).strip()
+        return re.search(
+            "(\s*configuration:)(.*)\n",
+            self._exec_response
+        ).group(2).strip()
 
     def ffmpeg_libav(self):
-        lines = re.search("^(\s*lib.*)+", self._exec_response, flags=re.MULTILINE).group(0).split("\n")
+        lines = re.search(
+            "^(\s*lib.*)+",
+            self._exec_response,
+            flags=re.MULTILINE
+        ).group(0).split("\n")
         return [n.strip() for n in lines]
 
     def ffmpeg_build(self):
-        return re.search("(\n\s*)(built on.*)(\n)", self._exec_response).group(2)
+        return re.search(
+            "(\n\s*)(built on.*)(\n)",
+            self._exec_response
+        ).group(2)
 
     def container(self):
         if not self._valid:
             return
-        return re.search("Input \#\d+\,\s*(\S+),\s*from", self._metadata).group(1)
+        return re.search(
+            "Input \#\d+\,\s*(\S+),\s*from",
+            self._metadata
+        ).group(1)
 
     def raw_duration(self):
-        return re.search("Duration:\s*([0-9\:\.]+),", self._exec_response).group(1)
+        return re.search(
+            "Duration:\s*([0-9\:\.]+),",
+            self._exec_response
+        ).group(1)
 
     def duration(self):
         if not self._valid:
             return
         units = self.raw_duration().split(":")
-        return (int(units[0]) * 60 * 60 * 1000) + (int(units[1]) * 60 * 1000) + int(float(units[2]) * 1000)
+        return (int(units[0]) * 60 * 60 * 1000) + \
+            (int(units[1]) * 60 * 1000) + \
+            int(float(units[2]) * 1000)
 
     def _bitrate_match(self):
         return re.search("bitrate: ([0-9\.]+)\s*(.*)\s+", self._metadata)
@@ -92,10 +130,17 @@ class VideoInspector(object):
         if not self._valid:
             return
 
-        m = re.search("Stream\s*(.*?)[,|:|\(|\[].*?\s*Video:\s*(.*?),\s*(.*?),\s*(\d*)x(\d*)", self.video_stream())
+        m = re.search(
+            "Stream\s*(.*?)[,|:|\(|\[].*?\s*"\
+            "Video:\s*(.*?),\s*(.*?),\s*(\d*)x(\d*)",
+            self.video_stream()
+        )
 
         if not m:
-            m = re.search("Stream\s*(.*?)[,|:|\(|\[].*?\s*Video:\s*(.*?),\s*(\d*)x(\d*)", self.video_stream())
+            m = re.search(
+                "Stream\s*(.*?)[,|:|\(|\[].*?\s*Video:\s*(.*?),\s*(\d*)x(\d*)",
+                self.video_stream()
+            )
 
         return m
 
@@ -140,7 +185,11 @@ class VideoInspector(object):
     def _audio_match(self):
         if not self._valid:
             return
-        return re.search("Stream\s*(.*?)[,|:|\(|\[].*?\s*Audio:\s*(.*?),\s*([0-9\.]*) (\w*),\s*([a-zA-Z:]*)", self.audio_stream())
+        return re.search(
+            "Stream\s*(.*?)[,|:|\(|\[].*?\s*Audio:\s*(.*?),\s*([0-9\.]*) "\
+            "(\w*),\s*([a-zA-Z:]*)",
+            self.audio_stream()
+        )
 
     def audio_codec(self):
         if not self._valid:

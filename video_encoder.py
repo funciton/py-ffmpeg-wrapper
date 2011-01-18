@@ -26,14 +26,28 @@ class VideoEncoder(object):
         if os.path.exists(video_output) and " -y " not in cmd:
             raise CantOverwrite()
 
-        cmd = cmd % {"ffmpeg_bin": self._ffmpeg_bin, "input_file": self.original_file.full_filename, "output_file": video_output}
+        cmd = cmd % {
+            "ffmpeg_bin": self._ffmpeg_bin,
+            "input_file": self.original_file.full_filename,
+            "output_file": video_output
+        }
         cmd = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
         if callback:
-            fcntl.fcntl(cmd.stderr.fileno(), fcntl.F_SETFL, fcntl.fcntl(cmd.stderr.fileno(), fcntl.F_GETFL) | os.O_NONBLOCK, )
+            fcntl.fcntl(
+                cmd.stderr.fileno(),
+                fcntl.F_SETFL,
+                fcntl.fcntl(
+                    cmd.stderr.fileno(),
+                    fcntl.F_GETFL
+                ) | os.O_NONBLOCK,
+            )
 
             duration = None
             header = ""
-            progress_regex = re.compile("frame=.*time=([0-9\:\.]+)", flags=re.IGNORECASE)
+            progress_regex = re.compile(
+                "frame=.*time=([0-9\:\.]+)",
+                flags=re.IGNORECASE
+            )
             header_received = False
 
             while True:
@@ -47,21 +61,45 @@ class VideoEncoder(object):
                         if not header_received:
                             header_received = True
 
-                            if re.search(".*command\snot\sfound", header, flags=re.IGNORECASE):
+                            if re.search(
+                                ".*command\snot\sfound",
+                                header,
+                                flags=re.IGNORECASE
+                            ):
                                 raise CommandError()
 
-                            if re.search("Unknown format", header, flags=re.IGNORECASE):
+                            if re.search(
+                                "Unknown format",
+                                header,
+                                flags=re.IGNORECASE
+                            ):
                                 raise UnknownFormat()
 
-                            if re.search("Duration: N\/A", header, flags=re.IGNORECASE | re.MULTILINE):
+                            if re.search(
+                                "Duration: N\/A",
+                                header,
+                                flags=re.IGNORECASE | re.MULTILINE
+                            ):
                                 raise UnreadableFile()
 
-                            raw_duration = re.search("Duration:\s*([0-9\:\.]+),", header)
+                            raw_duration = re.search(
+                                "Duration:\s*([0-9\:\.]+),",
+                                header
+                            )
                             if raw_duration:
                                 units = raw_duration.group(1).split(":")
-                                duration = (int(units[0]) * 60 * 60 * 1000) + (int(units[1]) * 60 * 1000) + int(float(units[2]) * 1000)
+                                duration = (int(units[0]) * 60 * 60 * 1000) + \
+                                    (int(units[1]) * 60 * 1000) + \
+                                    int(float(units[2]) * 1000)
 
                         if duration and callback:
-                            callback(int(float(float(progress_match.group(1)) * 1000 / duration) * 100))
+                            callback(
+                                int(float(
+                                        float(
+                                            progress_match.group(1)
+                                        ) * 1000 / duration
+                                    ) * 100
+                                )
+                            )
                     else:
                         header += line
