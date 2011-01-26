@@ -1,14 +1,11 @@
 import subprocess
-import commands
 import fcntl
 import select
-import time
 import os
 import re
 
 from video_inspector import VideoInspector
 
-from errors import InputFileDoesNotExist
 from errors import CantOverwrite
 from errors import CommandError
 from errors import UnknownFormat
