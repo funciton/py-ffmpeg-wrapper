@@ -91,12 +91,9 @@ class VideoEncoder(object):
 
                         if duration and callback:
                             callback(
-                                int(float(
-                                        float(
-                                            progress_match.group(1)
-                                        ) * 1000 / duration
-                                    ) * 100
-                                )
+                                float(progress_match.group(1)) * 1000,
+                                duration
                             )
+
                     else:
                         header += line
