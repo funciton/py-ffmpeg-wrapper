@@ -16,7 +16,10 @@ class VideoEncoder(object):
 
     def __init__(self, video_source, ffmpeg_bin="ffmpeg"):
         self._ffmpeg_bin = ffmpeg_bin
-        self.original_file = VideoInspector(video_source, ffmpeg_bin)
+        if not isinstance(video_source, VideoInspector):
+            self.original_file = VideoInspector(video_source, ffmpeg_bin)
+        else:
+            self.original_file = video_source
 
     # %(ffmpeg_bin)s -i %(input_file)s %(output_file)s
     def execute(self, cmd, video_output, callback=None):
