@@ -1,6 +1,9 @@
 import unittest
+import os
+import time
 
 from video_inspector import VideoInspector
+from video_encoder import VideoEncoder
 
 
 class TestInspector(unittest.TestCase):
@@ -22,6 +25,22 @@ class TestInspector(unittest.TestCase):
 
     def testFPS(self):
         self.assertEquals(self._inspector.fps(), '24')
+
+
+class TestEncoder(unittest.TestCase):
+
+    def setUp(self):
+        self._encoder = VideoEncoder("input.mp4")
+
+    def testSyncEncoding(self):
+        t = time.time()
+        self._encoder.execute(
+            "%(ffmpeg_bin)s -i %(input_file)s %(output_file)s",
+            "./test.avi"
+        )
+        self.assertTrue(os.path.exists("test.avi"))
+        self.assertTrue((time.time() - t) > 5)  # 5 seconds min
+        os.remove("test.avi")
 
 
 if __name__ == "__main__":

@@ -22,7 +22,13 @@ class VideoEncoder(object):
             self.original_file = video_source
 
     # %(ffmpeg_bin)s -i %(input_file)s %(output_file)s
-    def execute(self, cmd, video_output, callback=None):
+    def execute(
+        self,
+        cmd,
+        video_output,
+        progress_callback=None,
+        complete_callback=None
+    ):
         if os.path.exists(video_output) and " -y " not in cmd:
             raise CantOverwrite()
 
@@ -31,8 +37,8 @@ class VideoEncoder(object):
             "input_file": self.original_file.full_filename,
             "output_file": video_output
         }
-        cmd = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
-        if callback:
+        if progress_callback:
+            cmd = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
             fcntl.fcntl(
                 cmd.stderr.fileno(),
                 fcntl.F_SETFL,
@@ -55,6 +61,8 @@ class VideoEncoder(object):
                 if progressline:
                     line = cmd.stderr.read()
                     if line == "":
+                        if complete_callback:
+                            complete_callback()
                         break
                     progress_match = progress_regex.match(line)
                     if progress_match:
@@ -92,11 +100,13 @@ class VideoEncoder(object):
                                     (int(units[1]) * 60 * 1000) + \
                                     int(float(units[2]) * 1000)
 
-                        if duration and callback:
-                            callback(
+                        if duration and progress_callback:
+                            progress_callback(
                                 float(progress_match.group(1)) * 1000,
                                 duration
                             )
 
                     else:
                         header += line
+        else:
+            cmd = subprocess.call(cmd, shell=True, stderr=subprocess.PIPE)
