@@ -31,7 +31,7 @@ class VideoEncoder(object):
             "input_file": self.original_file.full_filename,
             "output_file": video_output
         }
-        cmd = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
+        cmd = subprocess.Popen(cmd, stderr=subprocess.PIPE)
         if callback:
             fcntl.fcntl(
                 cmd.stderr.fileno(),
