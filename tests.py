@@ -36,7 +36,7 @@ class TestEncoder(unittest.TestCase):
         t = time.time()
         self._encoder.execute(
             "%(ffmpeg_bin)s -i %(input_file)s %(output_file)s",
-            "./test.avi"
+            "test.avi"
         )
         self.assertTrue(os.path.exists("test.avi"))
         self.assertTrue((time.time() - t) > 5)  # 5 seconds min
