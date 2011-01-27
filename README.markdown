@@ -14,8 +14,11 @@
     video = VideoEncoder("/path/to/video_input.mov")
     def print_progress(current_pos, duration):
         print "%s%%" % (current_pos / duration) * 100
+    def encoding_complete():
+        print "encoding complete"
     video.execute(
         "%(ffmpeg_bin)s -y -i %(input_file)s %(output_file)s",
         "/path/to/output.mp4",
-        print_progress
+        print_progress,
+        encoding_complete
     )
