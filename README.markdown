@@ -1,5 +1,11 @@
 #### python FFmpeg wrapper based on rVideo
 
+*Warning*
+
+Don't pass a user input as an ffmpeg execute command since it's executed with
+subprocess' shell argument set to True. This could lead to bad things (shell injection)
+
+
 *Sample usage (VideoInspector):*
 
     from video_inspector import VideoInspector
