@@ -1,12 +1,13 @@
 #### python FFmpeg wrapper based on rVideo
 
-*Warning*
+
+#### Warning
 
 Don't pass a user input as an ffmpeg execute command since it's executed with
 subprocess' shell argument set to True. This could lead to bad things (shell injection)
 
 
-*Sample usage (VideoInspector):*
+#### Sample usage (VideoInspector)
 
     from video_inspector import VideoInspector
     video = VideoInspector("/path/to/video.mov")
@@ -14,7 +15,7 @@ subprocess' shell argument set to True. This could lead to bad things (shell inj
     print video.fps()
 
 
-*Sample usage (VideoEncoder):*
+#### Sample usage (VideoEncoder)
 
     from video_encoder import VideoEncoder
     video = VideoEncoder("/path/to/video_input.mov")
